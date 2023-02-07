@@ -23,8 +23,6 @@ hide_default_format = """
 
 st.markdown(hide_default_format, unsafe_allow_html=True)
 
-# create columns
-col1, col2 = st.columns([5,1])
 
 # this will form the dropdown list
 clist = ['Cherokee County',
@@ -59,14 +57,24 @@ mig_dict = {
 mig_st = st.sidebar.radio("Select migration direction: ", mig_direction)
 
 # header text
-st.header("Migration Chart (2020 5-Yr ACS)")
+st.header("Metro Atlanta Migration by County")
+st.subheader("2020 5-Year ACS")
 
-# sidebar text
-# st.sidebar.header("Data note:")
-st.sidebar.markdown(
-    '**Data Note:**  \nWhile the ACS tracks international in-migration, it does *not* track international out-migration. Thus, each county\'s \
-Total Net Migration is calculated from its domestic in-migration only minus its domestic out-migration.'
-)
+
+# sidebar image
+image = Image.open('content/ARC_logo.png')
+col1, col2, col3 = st.sidebar.columns([1,3,1])
+with col1:
+    st.sidebar.write("")
+
+with col2:
+    st.sidebar.write(""
+    )
+
+with col3:
+    st.sidebar.write("")
+
+
 
 # set the text of the sub-heading under the header
 if mig_st == 'Total In Migration':
@@ -121,11 +129,17 @@ if mig_st == 'Net Migration (Negative)':
 
     # get a migration total to use as metric
     if mig_st == 'Total In Migration':
-        col2.metric(label='Total In Migration:', value=mig_prettify)
+        col2.metric(label='**Total In Migration:**', value=mig_prettify)
     elif mig_st == 'Total Out Migration':
         col2.metric(label='Total Out Migration:', value=mig_prettify)
     else:
         col2.metric(label='Total Net Migration:', value=mig_prettify)
+
+    # sidebar text
+    st.sidebar.markdown(
+    '*Note:  \nWhile the ACS tracks international in-migration, it does *not* track international out-migration. Thus, each county\'s \
+    Total Net Migration is calculated from its domestic in-migration minus its domestic out-migration.*'
+    )
 
     # instantiate the plot that will populate the app
     fig = px.bar(
@@ -256,6 +270,12 @@ else:
         col2.metric(label='Total Out Migration:', value=mig_prettify)
     else:
         col2.metric(label='Total Net Migration:', value=mig_prettify)
+
+       # sidebar text
+    st.sidebar.markdown(
+    '*Note:  \nWhile the ACS tracks international in-migration, it does *not* track international out-migration. Thus, each county\'s \
+    Total Net Migration is calculated from its domestic in-migration minus its domestic out-migration.*'
+    )
 
     # instantiate the plot that will populate the app
     fig = px.bar(
