@@ -58,8 +58,6 @@ mig_st = st.sidebar.radio("Select migration direction: ", mig_direction)
 
 # header text
 st.header("Metro Atlanta Migration by County")
-st.subheader("2020 5-Year ACS")
-
 
 # sidebar image
 image = Image.open('content/ARC_logo.png')
@@ -75,7 +73,6 @@ with col3:
     st.sidebar.write("")
 
 
-
 # set the text of the sub-heading under the header
 if mig_st == 'Total In Migration':
     st.write(f"Top 10 Origins of Inflow: **{county_st}**")
@@ -87,7 +84,10 @@ else:
     st.write(f"Top 10 Destinations of Net Outflow: **{county_st}**")
 
 # color of the plotly bars
-color_in_state = '#262730'
+color_metro = '#262730'
+color_GA = '#fd8d3c'
+color_US = '#d94801'
+color_continent = '#7f2704'
 color_oo_state = '#F28C28'
 
 # get the dataframe ready
@@ -104,6 +104,48 @@ df = df[['County Name of Geography A',
 
 # filter down to just get the county that's selected
 df = df[df['County Name of Geography A'] == county_st]
+
+# create a geography tag which will correpsond to the color of the data bar
+continent_list = [
+    'Africa',
+    'Asia',
+    'Europe',
+    'South America',
+    'Central America',
+    'Caribbean',
+    'U.S. Island Areas',
+    'Northern America',
+    'Oceania and At Sea'
+]
+
+ATL_list = [
+    'Cherokee County',
+    'Clayton County',
+    'Cobb County',
+    'DeKalb County',
+    'Douglas County',
+    'Fayette County',
+    'Forsyth County',
+    'Fulton County',
+    'Gwinnett County',
+    'Henry County',
+    'Rockdale County'
+]
+
+conditions = [
+    # a county in Metro Atlanta
+    df['County Name of Geography B'].isin(ATL_list),
+    # a county in Georgia but NOT in Metro Atlanta
+    (df['State of Geography B'] == 'Georgia') & (~df['County Name of Geography B'].isin(ATL_list)),
+    # a US county not in GA
+    (df['State of Geography B'] != 'Georgia') & (~df['State of Geography B'].isin(continent_list)),
+    # a continent
+    df['State of Geography B'].isin(continent_list),
+]
+
+choices = ['Metro Atlanta County', 'Non-Metro GA County', 'Non-GA County' ,'Continent']
+
+df['Geography_tag'] = np.select(conditions, choices)
 
 # --------------------------------------------------------------------------
 # grab the bottom / top 10
@@ -138,7 +180,7 @@ if mig_st == 'Net Migration (Negative)':
     # sidebar text
     st.sidebar.markdown(
     '*Note:  \nWhile the ACS tracks international in-migration, it does *not* track international out-migration. Thus, each county\'s \
-    Total Net Migration is calculated from its domestic in-migration minus its domestic out-migration.*'
+    Total Net Migration is calculated from its domestic in-migration minus its domestic out-migration.*  \n  \nData Source: 2020 5-Yr ACS'
     )
 
     # instantiate the plot that will populate the app
@@ -148,13 +190,23 @@ if mig_st == 'Net Migration (Negative)':
         x=df2['unique'].tolist(),
         y=mig_dict[mig_st],
         labels={
-            'x':" "
-            # 'x':f"<br><i>(Out-Of-State Regions Shown in <b><span style='color:{color_oo_state}'>Orange</span></b>)</i>"
+            'x':"",
+            'Geography_tag':'Geography Level'
             },
-        color=df2['OO_state'],
+        category_orders={
+            "Geography_tag":['Metro Atlanta County', 'Non-Metro GA County', 'Non-GA County', 'Continent']
+        },
+        # color=df2['OO_state'],
+        # color_discrete_map={
+        #     'No':color_in_state,
+        #     'Yes':color_oo_state
+        # },
+        color=df2['Geography_tag'],
         color_discrete_map={
-            'No':color_in_state,
-            'Yes':color_oo_state
+            'Metro Atlanta County':color_metro,
+            'Non-Metro GA County':color_GA,
+            'Non-GA County':color_US,
+            'Continent':color_continent
         },
         custom_data=['State of Geography B']
     )
@@ -173,7 +225,10 @@ if mig_st == 'Net Migration (Negative)':
         plot_bgcolor='rgba(0,80,0,0)',
         font_color='white',
         font_size=20,
-        showlegend=False,
+        legend={
+            'title_font_size':16,
+            'font_size':14
+        },
         yaxis=dict(
             showgrid=False
             ),
@@ -186,8 +241,7 @@ if mig_st == 'Net Migration (Negative)':
             ticktext = df2['County Name of Geography B']
             ),
         hoverlabel=dict(
-            font_size=16,
-            # font_color="#586e75",
+            font_size=16
             )
     )
 
@@ -217,14 +271,14 @@ if mig_st == 'Net Migration (Negative)':
         range=[-4000,0]
         )
 
-    fig.add_annotation(
-        showarrow=False,
-        yref='paper',
-        x=4.25,
-        y=0,
-        font_size=18,
-        text=f"<br><i>(Out-Of-State Regions Shown in <b><span style='color:{color_oo_state}'>Orange</span></b>)</i>"
-        )
+    # fig.add_annotation(
+    #     showarrow=False,
+    #     yref='paper',
+    #     x=4.25,
+    #     y=0,
+    #     font_size=18,
+    #     text=f"<br><i>(Out-Of-State Regions Shown in <b><span style='color:{color_oo_state}'>Orange</span></b>)</i>"
+    #     )
 
     # customize the Plotly modebar
     config={
@@ -274,7 +328,7 @@ else:
        # sidebar text
     st.sidebar.markdown(
     '*Note:  \nWhile the ACS tracks international in-migration, it does *not* track international out-migration. Thus, each county\'s \
-    Total Net Migration is calculated from its domestic in-migration minus its domestic out-migration.*'
+    Total Net Migration is calculated from its domestic in-migration minus its domestic out-migration.*  \n  \nData Source: 2020 5-Yr ACS'
     )
 
     # instantiate the plot that will populate the app
@@ -284,12 +338,24 @@ else:
         x=df2['unique'].tolist(),
         y=mig_dict[mig_st],
         labels={
-            'x':f"<br><i>(Out-Of-State Regions Shown in <b><span style='color:{color_oo_state}'>Orange</span></b>)</i>"
+            # 'x':f"<br><i>(Out-Of-State Regions Shown in <b><span style='color:{color_oo_state}'>Orange</span></b>)</i>",
+            'x':"",
+            'Geography_tag':'Geography Level'
             },
-        color=df2['OO_state'],
+        category_orders={
+            "Geography_tag":['Metro Atlanta County', 'Non-Metro GA County', 'Non-GA County', 'Continent']
+        },
+        # color=df2['OO_state'],
+        # color_discrete_map={
+        #     'No':color_metro,
+        #     'Yes':color_oo_state
+        # },
+        color=df2['Geography_tag'],
         color_discrete_map={
-            'No':color_in_state,
-            'Yes':color_oo_state
+            'Metro Atlanta County':color_metro,
+            'Non-Metro GA County':color_GA,
+            'Non-GA County':color_US,
+            'Continent':color_continent
         },
         custom_data=['State of Geography B']
     )
@@ -308,7 +374,10 @@ else:
         plot_bgcolor='rgba(0,80,0,0)',
         font_color='white',
         font_size=20,
-        showlegend=False,
+        legend={
+            'title_font_size':16,
+            'font_size':14
+        },
         yaxis=dict(
             showgrid=False
             ),
@@ -321,7 +390,6 @@ else:
             ),
         hoverlabel=dict(
             font_size=16,
-            # font_color="#586e75",
             )
     )
 
