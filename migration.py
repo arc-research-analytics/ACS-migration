@@ -191,7 +191,7 @@ if mig_st == 'Net Migration (Negative)':
         y=mig_dict[mig_st],
         labels={
             'x':"",
-            'Geography_tag':'Geography Level'
+            'Geography_tag':'Geography'
             },
         category_orders={
             "Geography_tag":['Metro Atlanta County', 'Non-Metro GA County', 'Non-GA County', 'Continent']
@@ -340,7 +340,7 @@ else:
         labels={
             # 'x':f"<br><i>(Out-Of-State Regions Shown in <b><span style='color:{color_oo_state}'>Orange</span></b>)</i>",
             'x':"",
-            'Geography_tag':'Geography Level'
+            'Geography_tag':'Geography'
             },
         category_orders={
             "Geography_tag":['Metro Atlanta County', 'Non-Metro GA County', 'Non-GA County', 'Continent']
