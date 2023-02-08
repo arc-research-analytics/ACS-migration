@@ -75,13 +75,13 @@ with col3:
 
 # set the text of the sub-heading under the header
 if mig_st == 'Total In Migration':
-    st.write(f"Top 10 Origins of Inflow: **{county_st}**")
+    st.write(f"Top 10 origins of inflow: **{county_st}** | Hover over each origin for additional information.")
 elif mig_st == 'Total Out Migration':
-    st.write(f"Top 10 Destinations of Outflow: **{county_st}**")
+    st.write(f"Top 10 destinations of outflow: **{county_st}** | Hover over each destination for additional information.")
 elif mig_st == 'Net Migration (Positive)':
-    st.write(f"Top 10 Origins of Net Inflow: **{county_st}**")
+    st.write(f"Top 10 origins of net inflow: **{county_st}** | Hover over each origin for additional information.")
 else:
-    st.write(f"Top 10 Destinations of Net Outflow: **{county_st}**")
+    st.write(f"Top 10 destinations of net outflow: **{county_st}** | Hover over each destination for additional information.")
 
 # color of the plotly bars
 color_metro = '#262730'
@@ -213,7 +213,7 @@ if mig_st == 'Net Migration (Negative)':
 
     # this will create the hover text over each bar
     custom_template = "<br>".join([
-            "<b>State or Region</b>: %{customdata[0]}<br>",
+            "State or Continent: <b>%{customdata[0]}</b><br>",
             "<extra></extra>"
         ])
 
@@ -362,7 +362,7 @@ else:
 
     # this will create the hover text over each bar
     custom_template = "<br>".join([
-            "<b>State or Region</b>: %{customdata[0]}<br>",
+            "State or Continent: <b>%{customdata[0]}</b><br>",
             "<extra></extra>"
         ])
 
